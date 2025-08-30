@@ -15,13 +15,6 @@ class ProductService {
 
     public function store(array $data): Product {
 
-        /*$product_to_save = new Product($data);
-
-        $category = Category::findOrFail($data['category_id']);
-        $product = $category->products()->save($product_to_save);
-        
-        return $product;*/
-
         return DB::transaction(function () use ($data) {
 
             $product_to_create = Product::create($data);
@@ -91,28 +84,6 @@ class ProductService {
             return $product->delete();
 
         });
-    }
-
-    /*public function delete(string $id){
-
-        $product = Product::findOrFail($id);
-        
-        $product->delete();
-
-        return $product;
-
-    }*/
-
-    public function update(string $id, array $data, string $image){
-
-        $product = Product::find($id);
-        $product->title = $data['title'];
-        $product->desc = $data['desc'];
-        $product->price = $data['price'];
-        $product->photo = $image;
-        $product->save();
-
-        return $product;
     }
 
     public function checkStock(string $id): bool {
@@ -189,5 +160,6 @@ class ProductService {
         return $featured_products;
 
     }
+
 
 }
