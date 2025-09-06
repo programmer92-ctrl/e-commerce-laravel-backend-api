@@ -11,30 +11,45 @@ use App\Events\OrderPlaced;
 
 class OrderService {
 
+    public function store(array $data): Order {
 
-    public function store(array $data): Order
-    {
         return DB::transaction(function () use ($data) {
-            // Find the authenticated user
+
             $user = auth()->user();
 
-            // Create the order
+            $cart = Cart::find($user->id);
+
             $order = $user->orders()->create($data);
 
-            // Iterate through order items and attach them to the order
-            foreach ($data['order_items'] as $itemData) {
+            foreach($cart->cartItems as $cartItem){
 
-                $order->orderItems()->create($itemData);
-                
+                    $order->orderItems()->create([
+                        'product_id' => $cartItem->product->id,
+                        'quantity' => $cartItem->quantity,
+                        'product_name' => $cartItem->product->name,
+                        'product_price' => $cartItem->product->price,
+                        'subtotal' => $cartItem->product->price * $cartItem->quantity,
+                        'product_sku_code' => $cartItem->product->sku,
+                    ]);
+
+                    $product = Product::findOrFail($cartItem->product->id);
+                    $option = 'decrement';
+
+                    OrderPlaced::dispatch($product, $cartItem->quantity, $option);
+
+            }
+            
+            foreach($order->orderItems as $orderItem){
+
+                $order->total_amount += $orderItem->subtotal;
+                $order->save();
+
             }
 
-            $product = Product::findOrFail($itemData['product_id']);
-            $option = 'decrement';
-
-            OrderPlaced::dispatch($product, $itemData['quantity'], $option);
-
             return $order;
+
         });
+
     }
 
     public function index(): LengthAwarePaginator {
@@ -79,3 +94,4 @@ class OrderService {
 
 
 }
+
