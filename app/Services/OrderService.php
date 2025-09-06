@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -94,4 +97,5 @@ class OrderService {
 
 
 }
+
 
