@@ -24,30 +24,43 @@ class OrderService {
 
             $order = $user->orders()->create($data);
 
+            foreach($cart->cartItems as $cartItem) {
+                
+                if ($cartItem->product->stock_quantity < $cartItem->quantity) {
+                    
+                    throw new Exception('Product not in stock: ' . $cartItem->product->name);
+                
+                }
+        
+            }
+
+
             foreach($cart->cartItems as $cartItem){
 
-                    $order->orderItems()->create([
-                        'product_id' => $cartItem->product->id,
-                        'quantity' => $cartItem->quantity,
-                        'product_name' => $cartItem->product->name,
-                        'product_price' => $cartItem->product->price,
-                        'subtotal' => $cartItem->product->price * $cartItem->quantity,
-                        'product_sku_code' => $cartItem->product->sku,
-                    ]);
+                $order->orderItems()->create([
+                    'product_id' => $cartItem->product->id,
+                    'quantity' => $cartItem->quantity,
+                    'product_name' => $cartItem->product->name,
+                    'product_price' => $cartItem->product->price,
+                    'subtotal' => $cartItem->product->price * $cartItem->quantity,
+                    'product_sku_code' => $cartItem->product->sku,
+                ]);
 
-                    $product = Product::findOrFail($cartItem->product->id);
-                    $option = 'decrement';
+                $product = Product::findOrFail($cartItem->product->id);
+                $option = 'decrement';
 
-                    OrderPlaced::dispatch($product, $cartItem->quantity, $option);
-
+                OrderPlaced::dispatch($product, $cartItem->quantity, $option);
             }
-            
+
+            $totalAmount = 0;
+
             foreach($order->orderItems as $orderItem){
 
-                $order->total_amount += $orderItem->subtotal;
-                $order->save();
+                $totalAmount += $orderItem->subtotal;
 
             }
+
+            $order->update(['total_amount' => $totalAmount]);
 
             return $order;
 
@@ -97,5 +110,6 @@ class OrderService {
 
 
 }
+
 
 
