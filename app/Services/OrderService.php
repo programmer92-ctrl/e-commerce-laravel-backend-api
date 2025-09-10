@@ -34,7 +34,6 @@ class OrderService {
         
             }
 
-
             foreach($cart->cartItems as $cartItem){
 
                 $order->orderItems()->create([
@@ -133,6 +132,7 @@ class OrderService {
 
 
 }
+
 
 
 
