@@ -34,6 +34,7 @@ class OrderService {
         
             }
 
+
             foreach($cart->cartItems as $cartItem){
 
                 $order->orderItems()->create([
@@ -56,6 +57,29 @@ class OrderService {
             foreach($order->orderItems as $orderItem){
 
                 $totalAmount += $orderItem->subtotal;
+
+            }
+
+            $totalAmount += $order->tax_amount;
+            
+            if($order->shipping_method === 'Ground'){
+
+                $order->update(['shipping_cost' => 12.00]);
+                $totalAmount += $order->shipping_cost;
+
+            }
+
+            if($order->shipping_method === 'Standard'){
+
+                $order->update(['shipping_cost' => 14.00]);
+                $totalAmount += $order->shipping_cost;
+
+            }
+
+            if($order->shipping_method === 'Express'){
+
+                $order->update(['shipping_cost' => 16.00]);
+                $totalAmount += $order->shipping_cost;
 
             }
 
@@ -109,6 +133,7 @@ class OrderService {
 
 
 }
+
 
 
 
