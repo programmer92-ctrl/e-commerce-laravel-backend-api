@@ -100,7 +100,7 @@ class CartService {
 
     public function update(string $productId, int $quantity): Cart {
         
-        return DB::transaction(function () use ($productId) {
+        return DB::transaction(function () use ($productId, $quantity) {
 
             $product = Product::findOrFail($productId);
             $isActive = true;
@@ -184,3 +184,4 @@ class CartService {
     }
 
 }
+
