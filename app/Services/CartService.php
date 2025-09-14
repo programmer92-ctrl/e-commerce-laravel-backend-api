@@ -6,7 +6,10 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use App\Exceptions\ProductOutOfStockException;
+use App\Exceptions\ProductIsNotActiveException;
 use Illuminate\Database\Eloquent\Collection;
+use App\Enums\ShippingMethod;
 
 class CartService {
 
@@ -22,10 +25,11 @@ class CartService {
         
             $product = Product::findOrFail($productId);
             $isActive = true;
-            
-            if($product->is_active == $isActive) {
+            $inStock = true;
 
-                if($product->stock_quantity >= $quantity) {
+            if($this->isActive($product->is_active) == $isActive) {
+
+                if($this->hasStock($product->stock_quantity, $quantity) == $inStock) {
 
                     $cart = $this->getCart();
 
@@ -51,13 +55,13 @@ class CartService {
 
                 } else {
 
-                    throw new Exception('Product out of stock: ' . $product->name);
+                    throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
 
                 }
 
             } else {
 
-                throw new Exception('Product is not active: ' . $product->name);
+                throw new ProductIsNotActiveException('Product is not active: ' . $product->name);
 
             }
 
@@ -74,7 +78,7 @@ class CartService {
 
     public function index(): Collection {
 
-        $cart = Cart::where('user_id', auth()->user()->id)->with('cartItems')->get();
+        $cart = Cart::where('user_id', auth()->user()->id)->with('cartItems.product')->get();
 
         if ($cart->isEmpty()) {
 
@@ -104,10 +108,11 @@ class CartService {
 
             $product = Product::findOrFail($productId);
             $isActive = true;
+            $inStock = true;
 
-            if($product->is_active == $isActive) {
+            if($this->isActive($product->is_active) == $isActive) {
 
-                if($product->stock_quantity >= $quantity) {
+                if($this->hasStock($product->stock_quantity, $quantity) == $inStock) {
 
                     $cart = $this->getCart();
 
@@ -134,22 +139,50 @@ class CartService {
 
                     } else {
 
-                        throw new Exception('Product out of stock: ' . $product->name);
+                        throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
 
                     }
 
                 } else {
 
-                    throw new Exception('Product not active: ' . $product->name);
+                    throw new ProductIsNotActiveException('Product not active: ' . $product->name);
                 }
 
         });
 
     }
 
-    public function calculateTotalAmountForCart(array $data): float {
+    private function isActive(bool $active): bool {
 
-        $cart = auth()->user()->cart();
+        if($active == true) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
+    private function hasStock(int $productQuantity, int $quantity): bool {
+
+        if($productQuantity >= $quantity) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
+    public function calculateTotalAmountForCart(string $shippingMethod, float $taxAmount): float {
+
+        $cart = auth()->user()->cart()->with('cartItems')->get();
 
         $totalAmount = 0;
 
@@ -159,29 +192,28 @@ class CartService {
 
         }
 
-        if($data['shippingCost'] === 'Ground') {
+        if($shippingMethod === ShippingMethod::Ground) {
 
             $totalAmount += 12.00;
 
         }
 
-        if($data['shippingCost'] === 'Standard') {
+        if($shippingMethod === ShippingMethod::Standard) {
 
             $totalAmount += 14.00;
 
         }
 
-        if($data['shippingCost'] === 'Express') {
+        if($shippingMethod === ShippingMethod::Express) {
 
             $totalAmount += 16.00;
 
         }
 
-        $totalAmount += $data['tax_amount'];
+        $totalAmount += $taxAmount;
 
         return $totalAmount;
 
     }
 
 }
-
