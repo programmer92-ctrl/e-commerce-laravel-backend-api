@@ -192,19 +192,19 @@ class CartService {
 
         }
 
-        if($shippingMethod === ShippingMethod::Ground) {
+        if($shippingMethod === ShippingMethod::Ground->value) {
 
             $totalAmount += 12.00;
 
         }
 
-        if($shippingMethod === ShippingMethod::Standard) {
+        if($shippingMethod === ShippingMethod::Standard->value) {
 
             $totalAmount += 14.00;
 
         }
 
-        if($shippingMethod === ShippingMethod::Express) {
+        if($shippingMethod === ShippingMethod::Express->value) {
 
             $totalAmount += 16.00;
 
@@ -217,3 +217,4 @@ class CartService {
     }
 
 }
+
