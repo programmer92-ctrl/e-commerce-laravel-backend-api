@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum ShippingMethod
+enum ShippingMethod: string
 {
     //
-    case Ground;
-    case Standard;
-    case Express;
+    case Ground = 'Ground';
+    case Standard = 'Standard';
+    case Express = 'Express';
 }
