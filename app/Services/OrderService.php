@@ -64,21 +64,21 @@ class OrderService {
 
             $totalAmount += $order->tax_amount;
             
-            if($order->shipping_method === ShippingMethod::Ground){
+            if($order->shipping_method === ShippingMethod::Ground->value){
 
                 $order->update(['shipping_cost' => 12.00]);
                 $totalAmount += $order->shipping_cost;
 
             }
 
-            if($order->shipping_method === ShippingMethod::Standard){
+            if($order->shipping_method === ShippingMethod::Standard->value){
 
                 $order->update(['shipping_cost' => 14.00]);
                 $totalAmount += $order->shipping_cost;
 
             }
 
-            if($order->shipping_method === ShippingMethod::Express){
+            if($order->shipping_method === ShippingMethod::Express->value){
 
                 $order->update(['shipping_cost' => 16.00]);
                 $totalAmount += $order->shipping_cost;
@@ -135,3 +135,4 @@ class OrderService {
 
 
 }
+
