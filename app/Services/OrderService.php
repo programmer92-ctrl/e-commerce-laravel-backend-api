@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use App\Events\OrderPlaced;
+use Exception;
+use App\Exceptions\ProductOutOfStockException;
+use App\Enums\ShippingMethod;
 
 class OrderService {
 
@@ -28,7 +31,7 @@ class OrderService {
                 
                 if ($cartItem->product->stock_quantity < $cartItem->quantity) {
                     
-                    throw new Exception('Product not in stock: ' . $cartItem->product->name);
+                    throw new ProductOutOfStockException('Product out of stock: ' . $cartItem->product->name);
                 
                 }
         
@@ -61,21 +64,21 @@ class OrderService {
 
             $totalAmount += $order->tax_amount;
             
-            if($order->shipping_method === 'Ground'){
+            if($order->shipping_method === ShippingMethod::Ground){
 
                 $order->update(['shipping_cost' => 12.00]);
                 $totalAmount += $order->shipping_cost;
 
             }
 
-            if($order->shipping_method === 'Standard'){
+            if($order->shipping_method === ShippingMethod::Standard){
 
                 $order->update(['shipping_cost' => 14.00]);
                 $totalAmount += $order->shipping_cost;
 
             }
 
-            if($order->shipping_method === 'Express'){
+            if($order->shipping_method === ShippingMethod::Express){
 
                 $order->update(['shipping_cost' => 16.00]);
                 $totalAmount += $order->shipping_cost;
