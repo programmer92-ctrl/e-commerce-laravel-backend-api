@@ -163,8 +163,6 @@ class CartService {
                     throw new ProductIsNotActiveException('Product not active: ' . $product->name);
                 }
 
-        return false;
-
     }
 
     public function calculateTotalAmountForCart(string $shippingMethod, float $taxAmount): float {
@@ -204,4 +202,5 @@ class CartService {
     }
 
 }
+
 
