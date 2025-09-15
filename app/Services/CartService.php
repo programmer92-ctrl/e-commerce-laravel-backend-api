@@ -24,14 +24,11 @@ class CartService {
         return DB::transaction(function () use ($productId, $quantity) {
         
             $product = Product::findOrFail($productId);
-            $isActive = true;
-            $inStock = true;
+            $productValidated = true;
+            
+            if($this->validateProductStatus($product->is_active, $product->stock_quantity, $quantity, $product->name) == $productValidated){
 
-            if($this->isActive($product->is_active) == $isActive) {
-
-                if($this->hasStock($product->stock_quantity, $quantity) == $inStock) {
-
-                    $cart = $this->getCart();
+                $cart = $this->getCart();
 
                     $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
 
@@ -53,17 +50,7 @@ class CartService {
 
                     }
 
-                } else {
-
-                    throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
-
-                }
-
-            } else {
-
-                throw new ProductIsNotActiveException('Product is not active: ' . $product->name);
-
-            }
+            }   
 
         });
     }
@@ -79,12 +66,6 @@ class CartService {
     public function index(): Collection {
 
         $cart = Cart::where('user_id', auth()->user()->id)->with('cartItems.product')->get();
-
-        if ($cart->isEmpty()) {
-
-            return $cart;
-
-        }
 
         return $cart;
 
@@ -107,14 +88,11 @@ class CartService {
         return DB::transaction(function () use ($productId, $quantity) {
 
             $product = Product::findOrFail($productId);
-            $isActive = true;
-            $inStock = true;
+            $productValidated = true;
 
-            if($this->isActive($product->is_active) == $isActive) {
+            if($this->validateProductStatus($product->is_active, $product->stock_quantity, $quantity, $product->name) == $productValidated){
 
-                if($this->hasStock($product->stock_quantity, $quantity) == $inStock) {
-
-                    $cart = $this->getCart();
+                $cart = $this->getCart();
 
                     $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
 
@@ -133,20 +111,11 @@ class CartService {
 
                             return $cart;
 
-                        }
-
                     }
 
-                    } else {
-
-                        throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
-
-                    }
-
-                } else {
-
-                    throw new ProductIsNotActiveException('Product not active: ' . $product->name);
                 }
+            }
+
 
         });
 
@@ -154,15 +123,7 @@ class CartService {
 
     private function isActive(bool $active): bool {
 
-        if($active == true) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
+        return $active;
 
     }
 
@@ -180,9 +141,35 @@ class CartService {
 
     }
 
+    private function validateProductStatus(bool $active, int $productQuantity, int $quantity, $product): bool {
+
+        $isActive = true;
+        $inStock = true;
+
+        if($this->isActive($active) == $isActive) {
+
+                if($this->hasStock($productQuantity, $quantity) == $inStock) {
+
+                    return true;
+
+                    } else {
+
+                        throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
+
+                    }
+
+                } else {
+
+                    throw new ProductIsNotActiveException('Product not active: ' . $product->name);
+                }
+
+        return false;
+
+    }
+
     public function calculateTotalAmountForCart(string $shippingMethod, float $taxAmount): float {
 
-        $cart = auth()->user()->cart()->with('cartItems')->get();
+        $cart = auth()->user()->cart()->with('cartItems.product');
 
         $totalAmount = 0;
 
@@ -217,4 +204,3 @@ class CartService {
     }
 
 }
-
