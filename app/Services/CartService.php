@@ -154,13 +154,13 @@ class CartService {
 
                     } else {
 
-                        throw new ProductOutOfStockException('Product out of stock: ' . $product->name);
+                        throw new ProductOutOfStockException('Product out of stock: ' . $product);
 
                     }
 
                 } else {
 
-                    throw new ProductIsNotActiveException('Product not active: ' . $product->name);
+                    throw new ProductIsNotActiveException('Product not active: ' . $product);
                 }
 
     }
@@ -202,5 +202,6 @@ class CartService {
     }
 
 }
+
 
 
