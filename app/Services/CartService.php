@@ -141,7 +141,7 @@ class CartService {
 
     }
 
-    private function validateProductStatus(bool $active, int $productQuantity, int $quantity, $product): bool {
+    private function validateProductStatus(bool $active, int $productQuantity, int $quantity, string $product): bool {
 
         $isActive = true;
         $inStock = true;
@@ -204,3 +204,4 @@ class CartService {
     }
 
 }
+
