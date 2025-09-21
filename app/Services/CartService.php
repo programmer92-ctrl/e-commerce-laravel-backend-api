@@ -104,19 +104,17 @@ class CartService {
                         $cartItem->quantity = $quantity;
                         $cartItem->save();
 
-                        return $cart;
-
                     } else {
 
                         $cartItem->delete();
-
-                        return $cart;
 
                     }
 
                 }
 
-        }
+            return $cart;
+
+        });
 
     }
 
@@ -188,3 +186,4 @@ class CartService {
     }
 
 }
+
