@@ -13,46 +13,42 @@ use App\Enums\ShippingMethod;
 
 class CartService {
 
-    public function getCart(): Cart {
+    public function store(string $productId, int $quantity = 0): Cart {
 
-        return  auth()->user()->cart()->firstOrCreate();
+        if($quantity <= 0) {
 
-    }
+            throw new InvalidArgumentException('Quantity must be greater than zero.');
 
-    public function store(string $productId, int $quantity = 1): Cart {
+        }
 
         return DB::transaction(function () use ($productId, $quantity) {
-        
-            $product = Product::findOrFail($productId);
-            $productValidated = true;
+
+            $product = $this->getProductForCart($productId);
+
+            $this->throwExceptions($product->stock_quantity, $product->is_active, $product->name);
+
+            $cart = $this->getCart();
             
-            if($this->validateProductStatus($product->is_active, $product->stock_quantity, $quantity, $product->name) == $productValidated){
+            $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
 
-                $cart = $this->getCart();
+            if ($cartItem) {
 
-                    $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
+                $cartItem->quantity += $quantity;
+                $cartItem->save();
+            
+            } else {
 
-                    if ($cartItem) {
+                $cart->cartItems()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                ]);
 
-                        $cartItem->quantity += $quantity;
-                        $cartItem->save();
+            }
 
-                        return $cart;
-
-                    } else {
-
-                        $cart->cartItems()->create([
-                            'product_id' => $product->id,
-                            'quantity' => $quantity,
-                        ]);
-
-                        return $cart;
-
-                    }
-
-            }   
+            return $cart;
 
         });
+
     }
 
     public function show(string $id): Cart {
@@ -83,91 +79,81 @@ class CartService {
 
     }
 
-    public function update(string $productId, int $quantity): Cart {
-        
+    public function update(string $productId, int $quantity = 0): Cart {
+
+        if($quantity <= 0){
+
+            throw new InvalidArgumentException("Quantity must be greater than zero.");
+
+        }
+
         return DB::transaction(function () use ($productId, $quantity) {
 
-            $product = Product::findOrFail($productId);
-            $productValidated = true;
+            $product = $this->getProductForCart($productId);
 
-            if($this->validateProductStatus($product->is_active, $product->stock_quantity, $quantity, $product->name) == $productValidated){
+            $this->throwExceptions($product->stock_quantity, $product->is_active, $product->name);
+        
+            $cart = $this->getCart();
 
-                $cart = $this->getCart();
+            $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
 
-                    $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
+                if ($cartItem) {
 
-                    if ($cartItem) {
+                    if ($quantity > 0) {
 
-                        if ($quantity > 0) {
+                        $cartItem->quantity = $quantity;
+                        $cartItem->save();
 
-                            $cartItem->quantity = $quantity;
-                            $cartItem->save();
+                        return $cart;
 
-                            return $cart;
+                    } else {
 
-                        } else {
+                        $cartItem->delete();
 
-                            $cartItem->delete();
-
-                            return $cart;
+                        return $cart;
 
                     }
 
                 }
-            }
-
-
-        });
-
-    }
-
-    private function isActive(bool $active): bool {
-
-        return $active;
-
-    }
-
-    private function hasStock(int $productQuantity, int $quantity): bool {
-
-        if($productQuantity >= $quantity) {
-
-            return true;
-
-        } else {
-
-            return false;
 
         }
 
     }
 
-    private function validateProductStatus(bool $active, int $productQuantity, int $quantity, string $product): bool {
+    public function getCart(): Cart {
 
-        $isActive = true;
-        $inStock = true;
+        return  auth()->user()->cart()->firstOrCreate();
 
-        if($this->isActive($active) == $isActive) {
+    }
 
-                if($this->hasStock($productQuantity, $quantity) == $inStock) {
+    public function getProductForCart(string $productId): Product {
 
-                    return true;
+        return Product::where('id', $productId)
+            ->where('is_active', true)
+            ->where('stock_quantity', '>', 0)
+            ->firstOrFail();
 
-                    } else {
+    }
 
-                        throw new ProductOutOfStockException('Product out of stock: ' . $product);
+    public function throwExceptions($stockQuanity, $isActive, $productName): void {
 
-                    }
+        if($stockQuanity <= 0){
 
-                } else {
+                throw new ProductOutOfStockException('Product out of stock: ' . $productName);
 
-                    throw new ProductIsNotActiveException('Product not active: ' . $product);
-                }
+            }
+
+            if($isActive === false){
+
+                throw new ProductIsNotActiveException('Product not active: ' . $productName);
+
+            }
 
     }
 
     public function calculateTotalAmountForCart(string $shippingMethod, float $taxAmount): float {
 
-        $cart = auth()->user()->cart()->with('cartItems.product');
+        $cart = auth()->user()->cart()->with('cartItems.product')->first();
 
         $totalAmount = 0;
 
@@ -202,6 +188,3 @@ class CartService {
     }
 
 }
-
-
-
