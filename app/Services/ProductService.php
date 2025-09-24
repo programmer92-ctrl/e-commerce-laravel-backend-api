@@ -155,6 +155,12 @@ class ProductService {
                 case 'name_desc':
                     $query->orderBy('name', 'desc');
                     break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
             
             }
 
@@ -269,4 +275,5 @@ class ProductService {
     }
 
 }
+
 
