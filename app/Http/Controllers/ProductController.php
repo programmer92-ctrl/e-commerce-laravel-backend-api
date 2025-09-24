@@ -18,6 +18,7 @@ class ProductController extends Controller
         $product = $product->store($request->validated());
 
             return response()->json([
+                'message' => 'Product created successfully!',
                 'product' => $product,
             ]);
     }
@@ -26,6 +27,7 @@ class ProductController extends Controller
 
         $product = $product->getProductsByCategory($category_name);
         return response()->json([
+            'message' => 'Products by category retrieved successfully!',
             'products' => $product,
         ]);
 
@@ -36,6 +38,7 @@ class ProductController extends Controller
         $product = $product->index();
 
         return response()->json([
+            'message' => 'Products retrieved successfully!',
             'products' => $product,
         ]);
 
@@ -45,6 +48,7 @@ class ProductController extends Controller
 
         $product = $product->show($id);
         return response()->json([
+            'message' => 'Product retrieved successfully!',
             'product' => $product,
         ]);
 
@@ -54,6 +58,7 @@ class ProductController extends Controller
 
         $product = $product->delete($id);
         return response()->json([
+            'message' => 'Product deleted succussfully!',
             'product' => $product,
         ]);
 
@@ -70,6 +75,19 @@ class ProductController extends Controller
         $product = (new ProductService)->update($id, $validated_data, $path);
         return response()->json([
             'message' => 'Product updated successfully!',
+            'product' => $product,
+        ]);
+
+    }
+
+    public function searchProducts(Request $request, ProductService $productService): JsonResponse {
+
+        $filters = $request->all();
+
+        $product = $productService->searchProducts($filters);
+
+        return response()->json([
+            'message' => 'Search for product request successful!',
             'product' => $product,
         ]);
 
