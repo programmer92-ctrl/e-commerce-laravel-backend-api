@@ -6,7 +6,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\AttributeOptionsController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProductSkuController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -14,6 +17,16 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/attribute/add', [AttributeController::class, 'store']);
+    Route::get('/attribute/{id}', [AttributeController::class, 'show']);
+
+    Route::post('/attribute_option/add', [AttributeOptionsController::class, 'store']);
+    Route::get('/attribute_option/{id}', [AttributeOptionsController::class, 'show']);
+
+    Route::post('/productsku/add', [ProductSkuController::class, 'syncAttributeOptions']);
+    Route::get('/productsku/{id}', [ProductSkuController::class, 'show']);
+    Route::get('/productsku/all', [ProductSkuController::class, 'index']);
 
     Route::get('/orders/all', [OrderController::class, 'index']);
     Route::get('/order/{id}', [OrderController::class, 'show']);
