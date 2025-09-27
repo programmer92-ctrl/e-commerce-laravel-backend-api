@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Exceptions\ProductOutOfStockException;
 use App\Exceptions\ProductIsNotActiveException;
+use App\Exceptions\QuantityExceedsStockException;
 use Illuminate\Database\Eloquent\Collection;
 use App\Enums\ShippingMethod;
 
@@ -15,17 +16,13 @@ class CartService {
 
     public function store(string $productId, int $quantity = 0): Cart {
 
-        if($quantity <= 0) {
-
-            throw new InvalidArgumentException('Quantity must be greater than zero.');
-
-        }
+        $this->checkQuantity($quantity);
 
         return DB::transaction(function () use ($productId, $quantity) {
 
             $product = $this->getProductForCart($productId);
 
-            $this->throwExceptions($product->stock_quantity, $product->is_active, $product->name);
+            $this->throwExceptions($product->stock_quantity, $product->is_active, $quantity, $product->name);
 
             $cart = $this->getCart();
             
@@ -81,17 +78,13 @@ class CartService {
 
     public function update(string $productId, int $quantity = 0): Cart {
 
-        if($quantity <= 0){
-
-            throw new InvalidArgumentException("Quantity must be greater than zero.");
-
-        }
+        $this->checkQuantity($quantity);
 
         return DB::transaction(function () use ($productId, $quantity) {
 
             $product = $this->getProductForCart($productId);
 
-            $this->throwExceptions($product->stock_quantity, $product->is_active, $product->name);
+            $this->throwExceptions($product->stock_quantity, $product->is_active, $quantity, $productName);
         
             $cart = $this->getCart();
 
@@ -129,23 +122,40 @@ class CartService {
         return Product::where('id', $productId)
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
+            ->lockForUpdate()
             ->firstOrFail();
 
     }
 
-    public function throwExceptions($stockQuanity, $isActive, $productName): void {
+    public function checkQuantity(int $quantity): void {
 
-        if($stockQuanity <= 0){
+        if($quantity <= 0){
 
-                throw new ProductOutOfStockException('Product out of stock: ' . $productName);
+            throw new \InvalidArgumentException("Quantity must be greater than zero.");
 
-            }
+        }
 
-            if($isActive === false){
+    }
 
-                throw new ProductIsNotActiveException('Product not active: ' . $productName);
+    public function throwExceptions(int $stockQuantity, bool $isActive, int $requestedQuantity, string $prodouctName): void {
 
-            }
+        if($stockQuantity <= 0){
+
+            throw new ProductOutOfStockException('Product out of stock: ' . $productName);
+
+        }
+
+        if($isActive == false){
+
+            throw new ProductIsNotActiveException('Product not active: ' . $productName);
+
+        }
+
+        if ($requestedQuantity > $stockQuantity) {
+
+           throw new QuantityExceedsStockException('The requested quantity exceeds the available stock for ' . $productName);
+
+        }
 
     }
 
@@ -186,4 +196,3 @@ class CartService {
     }
 
 }
-
