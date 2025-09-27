@@ -25,9 +25,9 @@ class ProductSku extends Model
 
     public function attributeOptions(): BelongsToMany {
         return $this->belongsToMany(AttributeOption::class,
-            'attribute_option_product_sku', // 1. Pivot Table Name
-            'product_sku_id',               // 2. Foreign key of this model in the pivot table
-            'attribute_option_id'           // 3. Foreign key of the other model in the pivot table
+            'attribute_option_product_sku',
+            'product_sku_id',
+            'attribute_option_id'
         )->withPivot('price_modifier');
     }
 }
