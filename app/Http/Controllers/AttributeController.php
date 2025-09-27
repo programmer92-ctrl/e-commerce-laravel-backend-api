@@ -8,9 +8,6 @@ use Illuminate\Http\JsonResponse;
 
 class AttributeController extends Controller
 {
-    //create attribute first id 1,2,3
-    //then create attribute options linking to the attribute id 1 or 2 or 3
-    //then create the Product sku service
 
     public function store(Request $request, AttributeService $attributeService) {
 
