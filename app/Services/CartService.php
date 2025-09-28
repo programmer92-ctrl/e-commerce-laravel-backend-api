@@ -14,7 +14,7 @@ use App\Enums\ShippingMethod;
 
 class CartService {
 
-    public function store(string $productId, int $quantity = 0): Cart {
+    public function store(string $productId, int $quantity = 0, int $productSkuId): Cart {
 
         $this->checkQuantity($quantity);
 
@@ -38,6 +38,7 @@ class CartService {
                 $cart->cartItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $quantity,
+                    'product_sku_id' => $productSkuId,
                 ]);
 
             }
@@ -196,3 +197,4 @@ class CartService {
     }
 
 }
+
