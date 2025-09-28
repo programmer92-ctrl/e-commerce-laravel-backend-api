@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\OrderItem;
+use App\Models\ProductSku;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,7 @@ class OrderService {
                     'product_price' => $cartItem->product->price,
                     'subtotal' => $cartItem->product->price * $cartItem->quantity,
                     'product_sku_code' => $cartItem->product->sku,
+                    'product_sku_id' => $cartItem->skus->id,
                 ]);
 
                 $product = Product::findOrFail($cartItem->product->id);
@@ -59,6 +61,7 @@ class OrderService {
             foreach($order->orderItems as $orderItem){
 
                 $totalAmount += $orderItem->subtotal;
+                $totalAmount += $orderItem->skus->price;
 
             }
 
@@ -135,4 +138,5 @@ class OrderService {
 
 
 }
+
 
