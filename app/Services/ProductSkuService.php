@@ -50,7 +50,7 @@ class ProductSkuService {
 
     public function index() {
 
-        $skus = ProductSku::with('attributeOptions', 'attributeOptions.attribute)->paginate(20);
+        $skus = ProductSku::with('attributeOptions', 'attributeOptions.attribute')->paginate(20);
 
         return $skus;
 
@@ -64,4 +64,5 @@ class ProductSkuService {
 
 
 }
+
 
