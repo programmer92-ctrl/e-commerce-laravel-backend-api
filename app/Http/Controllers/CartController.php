@@ -12,7 +12,7 @@ class CartController extends Controller
 
     public function store(Request $request, CartService $cart): JsonResponse {
 
-        $cart = $cart->store($request->productId, $request->quantity);
+        $cart = $cart->store($request->productId, $request->quantity, $request->productSkuId);
 
         return response()->json([
             'message' => 'item added to cart successfully',
