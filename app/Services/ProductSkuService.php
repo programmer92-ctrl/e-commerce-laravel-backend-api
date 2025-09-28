@@ -42,7 +42,7 @@ class ProductSkuService {
 
     public function show(string $id) {
 
-       $sku = ProductSku::where('id', $id)->with('attributeOptions')->firstOrFail();
+       $sku = ProductSku::where('id', $id)->with('attributeOptions', 'attributeOptions.attribute')->firstOrFail();
         
         return $sku;
 
@@ -50,7 +50,7 @@ class ProductSkuService {
 
     public function index() {
 
-        $skus = ProductSku::with('attributeOptions')->paginate(20);
+        $skus = ProductSku::with('attributeOptions', 'attributeOptions.attribute)->paginate(20);
 
         return $skus;
 
@@ -64,3 +64,4 @@ class ProductSkuService {
 
 
 }
+
