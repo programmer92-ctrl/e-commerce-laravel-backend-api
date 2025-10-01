@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\CartItem;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Exceptions\ProductOutOfStockException;
@@ -14,7 +15,7 @@ use App\Enums\ShippingMethod;
 
 class CartService {
 
-    public function store(string $productId, int $quantity = 0, int $productSkuId): Cart {
+    public function store(string $productId, int $quantity = 0): Cart {
 
         $this->checkQuantity($quantity);
 
@@ -38,7 +39,7 @@ class CartService {
                 $cart->cartItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $quantity,
-                    'product_sku_id' => $productSkuId,
+                    //'product_sku_id' => $skuId,
                 ]);
 
             }
@@ -49,11 +50,11 @@ class CartService {
 
     }
 
-    public function show(string $id): Cart {
+    public function show(Cart $cart, string $id): CartItem {
 
-        $cart = Cart::with('user', 'cartItems')->findOrFail($id);
+        $cart = Cart::with('user', 'cartItems')->findOrFail($cart->id);
 
-        return $cart;
+        return $cart->cartItems()->where('id', $id)->with('product')->firstOrFail();
         
     }
 
@@ -114,7 +115,7 @@ class CartService {
 
     public function getCart(): Cart {
 
-        return  auth()->user()->cart()->firstOrCreate();
+        return auth()->user()->cart()->firstOrCreate();
 
     }
 
@@ -169,6 +170,7 @@ class CartService {
         foreach($cart->cartItems as $cartItem) {
 
             $totalAmount += $cartItem->product->price * $cartItem->quantity;
+            //$totalAmount += $cartItem->skus->price * $cartItem->skus->quantity;
 
         }
 
@@ -197,4 +199,3 @@ class CartService {
     }
 
 }
-
