@@ -5,62 +5,75 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Services\CartService;
+use App\Models\Cart;
 
 class CartController extends Controller
 {
     //
 
-    public function store(Request $request, CartService $cart): JsonResponse {
+    public function store(Request $request, Cart $cart, CartService $cartService): JsonResponse {
 
-        $cart = $cart->store($request->productId, $request->quantity, $request->productSkuId);
+        $this->authorize('create', $cart);
+
+        $myCart = $cartService->store($request->productId, $request->quantity);
 
         return response()->json([
             'message' => 'item added to cart successfully',
-            'cart' => $cart,
+            'cart' => $myCart,
         ]);
 
     }
 
-    public function show(CartService $cart, string $cartId): JsonResponse {
+    public function show(Cart $cart, string $id, CartService $cartService): JsonResponse {
 
-        $cart = $cart->show($cartId);
+        $this->authorize('view', $cart);
+
+        //$myCart = $cartService->show($cartId);
+        $myCart = $cartService->show($cart, $id);
 
         return response()->json([
             'message' => 'cart',
-            'cart' => $cart,
+            'cart' => $myCart,
         ]);
 
     }
 
-    public function index(CartService $cart): JsonResponse {
+    public function index(Cart $cart, CartService $cartService): JsonResponse {
 
-        $cart = $cart->index();
+        $this->authorize('viewAny', $cart);
+
+
+        $myCart = $cartService->index();
 
         return response()->json([
             'message' => 'cart',
-            'cart' => $cart,
+            'cart' => $myCart,
         ]);
 
     }
 
-    public function update(Request $request, CartService $cart, string $productId): JsonResponse {
+    public function update(Request $request, Cart $cart, CartService $cartService, string $productId): JsonResponse {
 
-        $cart = $cart->update($productId, $request->quantity);
+        $this->authorize('update', $cart);
+
+        $myCart = $cartService->update($productId, $request->quantity);
 
         return response()->json([
             'message' => 'cart updated',
-            'cart' => $cart,
+            'cart' => $myCart,
         ]);
 
     }
 
-    public function delete(CartService $cart, string $productId): JsonResponse {
+    public function delete(Cart $cart, CartService $cartService, string $productId): JsonResponse {
 
-        $cart = $cart->delete($productId);
+        $this->authorize('delete', $cart);
+
+        $myCart = $cartService->delete($productId);
 
         return response()->json([
             'message' => 'item deleted from cart succussfully',
-            'cart' => $cart,
+            'cart' => $myCart,
         ]);
 
     }
