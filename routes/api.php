@@ -11,6 +11,8 @@ use App\Http\Controllers\AttributeOptionsController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductSkuController;
 
+use App\Models\Cart;
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -38,19 +40,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/category/{id}', [CategoryController::class, 'show']);
     Route::post('/category/add', [CategoryController::class, 'store']);
     Route::get('/category/all', [CategoryController::class, 'index']);
-    Route::post('/category/delete\{id}', [CategoryController::class, 'delete']);
+    Route::post('/category/delete/{id}', [CategoryController::class, 'delete']);
 
-    Route::get('products/all', [ProductController::class, 'index']);
-    Route::get('products/{id}', [ProductController::class, 'show']);
+    Route::get('/products/all', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/products/category/{category_name}', [ProductController::class, 'getProductsByCategory']);
     Route::post('/products/add', [ProductController::class, 'store']);
-    Route::post('products/search', [ProductController::class, 'searchProducts']);
+    Route::post('/products/search', [ProductController::class, 'searchProducts']);
 
-    Route::get('cart/user/all', [CartController::class, 'index']);
-    Route::get('cart/{cartId}', [CartController::class, 'show']);
-    Route::post('cart/add', [CartController::class, 'store']);
-    Route::post('cart/update/{productId}', [CartController::class, 'update']);
-    Route::delete('cart/{productId}', [CartController::class, 'delete']);
+    Route::get('/cart/{cart}/all', [CartController::class, 'index']);
+    Route::get('/cart/{cart}/{id}', [CartController::class, 'show']);
+    Route::post('/cart/{cart}/add', [CartController::class, 'store']);
+    Route::post('/cart/update/{productId}/{cart}', [CartController::class, 'update']);
+    Route::delete('/cart/{productId}/{cart}', [CartController::class, 'delete']);
     
 });
 
