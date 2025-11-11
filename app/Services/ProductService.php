@@ -18,10 +18,7 @@ class ProductService {
 
         return DB::transaction(function () use ($data) {
 
-            $product_to_create = Product::create($data);
-
-            $category = Category::findOrFail($data['category_id']);
-            $product = $category->products()->save($product_to_create);
+            $product = Product::create($data);
 
             if (isset($data['images'])) {
 
@@ -275,5 +272,6 @@ class ProductService {
     }
 
 }
+
 
 
