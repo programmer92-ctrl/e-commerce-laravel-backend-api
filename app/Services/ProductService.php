@@ -77,11 +77,8 @@ class ProductService {
 
         return DB::transaction(function () use ($data) {
 
-            $product_to_update = Product::findOrFail($id);
-            $product_to_update->update($data);
-
-            $category = Category::findOrFail($data['category_id']);
-            $product = $category->products()->save($product_to_create);
+            $product = Product::findOrFail($id);
+            $product->update($data);
 
             if (isset($data['images'])) {
 
@@ -272,6 +269,7 @@ class ProductService {
     }
 
 }
+
 
 
 
