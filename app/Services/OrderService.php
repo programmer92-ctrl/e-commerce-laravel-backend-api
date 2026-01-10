@@ -46,8 +46,6 @@ class OrderService {
                     'product_name' => $cartItem->product->name,
                     'product_price' => $cartItem->product->price,
                     'subtotal' => $cartItem->product->price * $cartItem->quantity,
-                    'product_sku_code' => $cartItem->product->sku,
-                    'product_sku_id' => $cartItem->skus->id,
                 ]);
 
                 $product = Product::findOrFail($cartItem->product->id);
@@ -61,7 +59,6 @@ class OrderService {
             foreach($order->orderItems as $orderItem){
 
                 $totalAmount += $orderItem->subtotal;
-                $totalAmount += $orderItem->skus->price;
 
             }
 
@@ -138,5 +135,6 @@ class OrderService {
 
 
 }
+
 
 
