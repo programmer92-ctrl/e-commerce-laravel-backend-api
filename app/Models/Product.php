@@ -21,7 +21,6 @@ class Product extends Model
         'short_description',
         'price',
         'compare_at_price',
-        'sku',
         'stock_quantity',
         'is_featured',
         'is_active',
