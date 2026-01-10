@@ -44,24 +44,6 @@ class OrderController extends Controller
 
     }
 
-    public function update(Request $request, array $validated_data, string $id){
-
-        $validated_data = $request->validate([
-            'product_id' => 'required|numeric',
-            'shipping_address' => 'required|string|max:255',
-            'billing_address' => 'required|string|max:255',
-            'order_number' => 'required|numeric',
-            'total_amount' => 'required|numeric',
-            'status' => 'required|string',
-        ]);
-        $order = (new OrderService)->update($validated_data, $id);
-        return response()->json([
-            'message' => 'Order updated successfully',
-            'order' => $order,
-        ]);
-
-    }
-
     public function delete(OrderService $order, string $id): JsonResponse {
 
         $order = $order->delete($id);
