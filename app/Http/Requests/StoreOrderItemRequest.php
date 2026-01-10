@@ -25,9 +25,7 @@ class StoreOrderItemRequest extends FormRequest
             //
             'order_id' => 'required|numeric',
             'product_id' => 'required|numeric',
-            'product_sku_id' => 'numeric',
             'product_name' => 'required|string|max:255',
-            'product_sku_code' => 'string|max:255',
             'product_price' => 'required|numeric',
             'quantity' => 'required|numeric',
             'subtotal' => 'required|numeric',
