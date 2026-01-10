@@ -27,8 +27,7 @@ class CartController extends Controller
     public function show(Cart $cart, string $id, CartService $cartService): JsonResponse {
 
         $this->authorize('view', $cart);
-
-        //$myCart = $cartService->show($cartId);
+        
         $myCart = $cartService->show($cart, $id);
 
         return response()->json([
