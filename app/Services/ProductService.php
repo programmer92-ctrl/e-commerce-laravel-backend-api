@@ -73,28 +73,6 @@ class ProductService {
         });
     }
 
-    public function update(array $data, string $id): Product {
-
-        return DB::transaction(function () use ($data) {
-
-            $product = Product::findOrFail($id);
-            $product->update($data);
-
-            if (isset($data['images'])) {
-
-                foreach ($data['images'] as $imageFile) {
-
-                    $path = $imageFile->store('images', 'public');
-                    $product->productImages()->create(['image_path' => $path]);
-
-                }
-            }
-
-            return $product;
-        });
-
-    }
-
     public function getProductsByCategory(string $category_name): LengthAwarePaginator {
 
         $category = Category::where('name', $category_name)->firstOrFail();
@@ -269,6 +247,7 @@ class ProductService {
     }
 
 }
+
 
 
 
