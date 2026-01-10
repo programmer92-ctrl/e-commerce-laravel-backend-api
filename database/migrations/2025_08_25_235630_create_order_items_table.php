@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->contstrained()->onDelete('cascade');
             $table->foreignId('product_id')->contstrained()->onDelete('cascade');
-            $table->foreignId('product_sku_id')->contstrained()->onDelete('cascade')->nullable();
             $table->string('product_name');
-            $table->string('product_sku_code')->nullable();
             $table->decimal('product_price', total: 10, places: 2);
             $table->integer('quantity');
             $table->decimal('subtotal', total:10, places: 2);
