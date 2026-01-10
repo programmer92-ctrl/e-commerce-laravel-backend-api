@@ -39,7 +39,6 @@ class CartService {
                 $cart->cartItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $quantity,
-                    //'product_sku_id' => $skuId,
                 ]);
 
             }
@@ -170,7 +169,6 @@ class CartService {
         foreach($cart->cartItems as $cartItem) {
 
             $totalAmount += $cartItem->product->price * $cartItem->quantity;
-            //$totalAmount += $cartItem->skus->price * $cartItem->skus->quantity;
 
         }
 
@@ -199,3 +197,4 @@ class CartService {
     }
 
 }
+
