@@ -62,22 +62,6 @@ class ProductController extends Controller
 
     }
 
-    public function update(Request $request, string $id): JsonResponse {
-
-        $validated_data = $request->validate([
-            'title' => 'required|string|max:255',
-            'desc' => 'required',
-            'price' => 'required|numeric',
-        ]);
-        $path = $request->file('image')->store('images', 'public');
-        $product = (new ProductService)->update($id, $validated_data, $path);
-        return response()->json([
-            'message' => 'Product updated successfully!',
-            'product' => $product,
-        ]);
-
-    }
-
     public function searchProducts(Request $request, ProductService $productService): JsonResponse {
 
         $filters = $request->all();
