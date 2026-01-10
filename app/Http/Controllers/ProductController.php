@@ -12,8 +12,6 @@ class ProductController extends Controller
     //
     
     public function store(StoreProductRequest $request, ProductService $product): JsonResponse {
-
-        //$path = $request->file('image')->store('images', 'public');
         
         $product = $product->store($request->validated());
 
