@@ -11,9 +11,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_id',
-        'product_sku_id',
         'product_name',
-        'product_sku_code',
         'product_price',
         'quantity',
         'subtotal',
@@ -28,10 +26,5 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Products::class);
     }
-
-    public function skus(): BelongsTo
-    {
-        return $this->belongsTo(ProductSku::class);
-    }
-    
+  
 }
