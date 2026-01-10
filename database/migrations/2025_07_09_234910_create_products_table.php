@@ -20,7 +20,6 @@ return new class extends Migration
             $table->text('short_description')->nullable();
             $table->decimal('price', total: 8, places: 2);
             $table->decimal('compare_at_price', total: 8, places: 2)->nullable();
-            $table->string('sku')->unqiue();
             $table->integer('stock_quantity');
             $table->boolean('is_featured')->default('false');
             $table->boolean('is_active')->default('true');
